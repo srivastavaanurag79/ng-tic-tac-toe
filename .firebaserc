@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "kattam-kutta": {
+      "hosting": {
+        "ng-tic-tac-toe": [
+          "kattam-kutta"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+<div *ngIf="playerCheck" class="main">
+  <div class="div-row">
+    <div class="div-col" style="text-align: center;">
+      <nb-card status="basic">
+        <nb-card-header>Player 1</nb-card-header>
+        <nb-card-body>
+          <h5 style="margin-top: 0; margin-bottom: 12px;">{{ player1 | titlecase}} is 'X'</h5>
+          <h5 style="margin-top: 0; margin-bottom: 12px;">Win: {{ player1Count}}</h5>
+        </nb-card-body>
+      </nb-card>
+    </div>
+    <div class="div-col" style="text-align: center;">
+      <nb-card status="basic">
+        <nb-card-header>Player 2</nb-card-header>
+        <nb-card-body>
+          <h5 style="margin-top: 0; margin-bottom: 12px;">{{ player2 | titlecase}} is 'O'</h5>
+          <h5 style="margin-top: 0; margin-bottom: 12px;">Win: {{ player2Count}}</h5>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+  <div style="text-align: center">
+    <button style="margin-bottom: 1rem !important; margin: 0 3px;" (click)="resetGame()" nbButton outline status="warning">Reset</button>
+    <button style="margin-bottom: 1rem !important; margin: 0 3px;" (click)="newGame()" nbButton outline status="danger">Start New Game</button>
+    <h5 *ngIf="!gameOver" style="margin-top: 0">Current Player: {{ player | titlecase}}</h5>
+  </div>
+  <main *ngIf="!gameOver">
+    <app-square *ngFor="let square of squares; let i = index" [value]="square" (click)="makeMove(i)"></app-square>
+  </main>
+  <div *ngIf="winner" class="card-row">
+    <div class="card-col" style="margin: 0 auto; width: 20rem;">
+      <nb-card status="danger">
+        <nb-card-header>Game Over</nb-card-header>
+        <nb-card-body>
+          <h4 *ngIf="winner === 'X'" style="text-align: center;">
+            {{ player1 | titlecase}} won the game !!
+          </h4>
+          <h4 *ngIf="winner === 'O'" style="text-align: center;">
+            {{ player2 | titlecase}} won the game !!
+          </h4>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+  <div *ngIf="winner === null && drawCheck === 9" class="card-row">
+    <div class="card-col" style="margin: 0 auto; width: 20rem;">
+      <nb-card status="danger">
+        <nb-card-header>Game Over</nb-card-header>
+        <nb-card-body>
+          <h4 style="text-align: center;">
+            It's a draw !!
+          </h4>
+        </nb-card-body>
+      </nb-card>
+    </div>
+  </div>
+</div>
+<div *ngIf="!playerCheck" class="card-col" style="margin: 0 auto; width: 20rem;">
+  <nb-card status="danger">
+    <nb-card-header>Player Data</nb-card-header>
+    <nb-card-body>
+      <form #userForm="ngForm" (ngSubmit)="submitPlayerData(userForm.value)" ngNativeValidate>
+        <input name="player1" [ngModel]="player1" required style="width: 100%; margin: 10px 0" type="text" nbInput placeholder="Enter Player 1 Name">
+        <input name="player2" [ngModel]="player2" required style="width: 100%; margin: 10px 0" type="text" nbInput placeholder="Enter Player 2 Name">
+        <button type="submit" style="margin-bottom: 1rem !important; margin: 0 3px; float: right" nbButton status="success">Submit</button>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</div>

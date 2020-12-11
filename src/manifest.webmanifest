@@ -1,0 +1,41 @@
+{
+  "name": "Kattam Kutta",
+  "short_name": "Kattam Kutta",
+  "theme_color": "#fafafa",
+  "background_color": "#1976d2",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./",
+  "icons": [
+    {
+      "src": "assets/favicon/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/favicon/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/favicon/mstile-150x150.png",
+      "sizes": "150x150",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/favicon/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/favicon/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ]
+}
