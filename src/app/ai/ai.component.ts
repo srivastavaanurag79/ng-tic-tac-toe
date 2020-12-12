@@ -15,15 +15,15 @@ export class AiComponent implements OnInit {
   ];
   winner: string;
   playerCheck: boolean = false;
-  startingPlayer: 'human' | 'computer' = 'computer';
+  startingPlayer: 'human' | 'ai' = 'ai';
   player1: string;
   player2: string = 'Computer';
   player1Count: number = 0;
   player2Count: number = 0;
   clickCount: number = 0;
-  ai: 'X' | 'O';
-  human: 'X' | 'O';
-  currentPlayer: 'computer' | 'human';
+  ai = 'X';
+  human = 'O';
+  currentPlayer;
   winnerName: string;
   gameOver: boolean = false;
 
@@ -36,14 +36,12 @@ export class AiComponent implements OnInit {
   submitPlayerData(form) {
     this.player1 = form.player1;
     this.playerCheck = true;
-    this.currentPlayer = this.startingPlayer;
-    if (this.startingPlayer === 'computer') {
-      this.ai = 'X';
-      this.human = 'O';
+    if (this.startingPlayer === 'ai') {
+      this.currentPlayer = this.ai;
       this.bestMove();
-    } else if (this.startingPlayer === 'human') {
-      this.ai = 'O';
-      this.human = 'X';
+    }
+    if(this.startingPlayer === 'human') {
+      this.currentPlayer = this.human;
     }
   }
 
@@ -71,43 +69,38 @@ export class AiComponent implements OnInit {
     ];
     this.winner = null;
     this.clickCount = 0;
-    if (this.startingPlayer === 'computer') {
+    if (this.startingPlayer === 'ai') {
+      this.currentPlayer = this.ai;
       this.bestMove();
     }
     if (this.startingPlayer === 'human') {
-      this.currentPlayer === this.startingPlayer;
+      this.currentPlayer = this.human;
     }
     this.gameOver = false;
   }
 
   makeMove(idx: number, idy: number) {
-    if (this.currentPlayer === 'human') {
+    if (this.currentPlayer === this.human) {
       if (!this.squares[idx][idy]) {
         this.squares[idx][idy] = this.human;
-        this.currentPlayer = 'computer';
+        this.currentPlayer = this.ai;
         this.clickCount++;
+        if (this.clickCount < 9) {
+          this.bestMove();
+        }
       } else {
         this.toastrService.show('This tile is already taken', `Warning`, { status: 'warning' });
       }
     }
-    if (this.clickCount < 9) {
-      this.bestMove();
-    }
     this.winner = this.checkWinner();
-    if (this.winner === 'X' && this.ai === 'X') {
-      this.player2Count++;
-      this.winnerName = this.player2;
-    } else if (this.winner === 'O' && this.ai === 'O') {
-      this.player2Count++;
-      this.winnerName = this.player2;
-    } else if (this.winner === 'X' && this.human === 'X') {
-      this.player1Count++;
-      this.winnerName = this.player1;
-    } else if (this.winner === 'O' && this.human === 'O') {
-      this.player1Count++;
-      this.winnerName = this.player1;
-    }
     if (this.winner != null) {
+      if (this.winner === 'X') {
+        this.player2Count++;
+        this.winnerName = this.player2;
+      } else if (this.winner === 'O') {
+        this.player1Count++;
+        this.winnerName = this.player1;
+      }
       setTimeout(() => { this.gameOver = true; }, 400)
     }
   }
@@ -174,7 +167,7 @@ export class AiComponent implements OnInit {
     }
     this.squares[move.i][move.j] = this.ai;
     this.clickCount++;
-    this.currentPlayer = 'human';
+    this.currentPlayer = this.human;
 
   }
 
