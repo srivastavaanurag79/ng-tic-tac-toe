@@ -1,0 +1,56 @@
+main {
+  display: grid;
+  grid-template-columns: 150px 150px 150px;
+  grid-gap: 0px;
+  grid-template-rows: 150px 150px 150px;
+  justify-content: center;
+  align-content: center;
+}
+
+.main {
+  padding: 50px 0px;
+}
+
+app-square {
+  border: 1px grey solid;
+  height: 150px;
+}
+
+.card-col {
+  flex: 1 0 calc(50% - 1rem);
+  margin: 0 0.5rem;
+}
+
+.card-row {
+  margin: 0 auto;
+  width: 20rem;
+}
+
+.div-row {
+  margin: 0 auto;
+  display: flex;
+  width: 40rem;
+}
+
+.div-col {
+  flex: 1 0 calc(50% - 1rem);
+  margin: 0 0.5rem;
+}
+
+@media (max-width: 600px) {
+
+  main {
+    grid-template-columns: 80px 80px 80px;
+    grid-template-rows: 80px 80px 80px;
+  }
+
+  app-square {
+    border: 1px grey solid;
+    height: 80px;
+  }
+
+  .div-row {
+    display: block;
+    width: 100%;
+  }
+}

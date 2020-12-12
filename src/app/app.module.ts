@@ -6,17 +6,19 @@ import { AppComponent } from './app.component';
 import { SquareComponent } from './square/square.component';
 import { BoardComponent } from './board/board.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NbThemeModule, NbLayoutModule, NbButtonModule, NbCardModule, NbInputModule, NbToastrModule } from '@nebular/theme';
+import { NbThemeModule, NbLayoutModule, NbButtonModule, NbCardModule, NbInputModule, NbToastrModule, NbSelectModule } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { FormsModule } from '@angular/forms';
+import { AiComponent } from './ai/ai.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SquareComponent,
-    BoardComponent
+    BoardComponent,
+    AiComponent
   ],
   imports: [
     BrowserModule,
@@ -31,6 +33,7 @@ import { FormsModule } from '@angular/forms';
     NbInputModule,
     FormsModule,
     NbToastrModule.forRoot({preventDuplicates: true }),
+    NbSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]

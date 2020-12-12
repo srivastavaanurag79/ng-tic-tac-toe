@@ -47,6 +47,7 @@ export class BoardComponent implements OnInit {
     this.winner = null;
     this.xIsNext = true;
     this.drawCheck = 0;
+    console.log(this.squares);
   }
 
   get player() {
