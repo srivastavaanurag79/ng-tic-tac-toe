@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
 
 @Component({
@@ -18,7 +19,11 @@ export class BoardComponent implements OnInit {
   player1Count: number = 0;
   player2Count: number = 0;
 
-  constructor(private toastrService: NbToastrService) { }
+  constructor(private toastrService: NbToastrService, private router: Router) { }
+
+  home() {
+    this.router.navigate(['/']);
+  }
 
   ngOnInit() {
     this.resetGame();
@@ -104,5 +109,21 @@ export class BoardComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  @HostListener("window:beforeunload", ["$event"])
+  unloadHandler(event: Event) {
+    console.log("Processing beforeunload...");
+    // Do more processing...
+    event.preventDefault();
+    event.returnValue = false;
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: Event) {
+    console.log('Back button pressed');
+
+    event.preventDefault();
+    event.returnValue = false;
   }
 }

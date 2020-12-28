@@ -1,8 +1,7 @@
 .div-row {
   margin: 0 auto;
   display: flex;
-  width: 100%;
-  height: inherit;
+  width: 40rem;
 }
 
 .div-col {
@@ -14,6 +13,20 @@
 
   .div-row {
     display: block;
+    width: 100%;
+  }
+}
+
+@media(max-width: 350px) {
+  .card-col {
+    width: auto;
+  }
+
+  .card-row {
+    width: 100%;
+  }
+
+  .div-row {
     width: 100%;
   }
 }

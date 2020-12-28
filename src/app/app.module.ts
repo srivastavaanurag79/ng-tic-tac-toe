@@ -12,13 +12,15 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { AiComponent } from './ai/ai.component';
+import { HomepageComponent } from './homepage/homepage.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SquareComponent,
     BoardComponent,
-    AiComponent
+    AiComponent,
+    HomepageComponent
   ],
   imports: [
     BrowserModule,

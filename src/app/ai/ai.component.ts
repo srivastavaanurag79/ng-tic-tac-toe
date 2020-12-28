@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
 
 @Component({
@@ -16,6 +17,7 @@ export class AiComponent implements OnInit {
   winner: string;
   playerCheck: boolean = false;
   startingPlayer: 'human' | 'ai' = 'ai';
+  level: 'easy' | 'insane' = 'insane';
   player1: string;
   player2: string = 'Computer';
   player1Count: number = 0;
@@ -27,7 +29,11 @@ export class AiComponent implements OnInit {
   winnerName: string;
   gameOver: boolean = false;
 
-  constructor(private toastrService: NbToastrService) { }
+  constructor(private toastrService: NbToastrService, private router: Router) { }
+
+  home() {
+    this.router.navigate(['/']);
+  }
 
   ngOnInit() {
     this.resetGame();
@@ -38,7 +44,11 @@ export class AiComponent implements OnInit {
     this.playerCheck = true;
     if (this.startingPlayer === 'ai') {
       this.currentPlayer = this.ai;
-      this.bestMove();
+      if(this.level === 'easy') {
+        this.badMove();
+      } else {
+        this.bestMove();
+      }
     }
     if(this.startingPlayer === 'human') {
       this.currentPlayer = this.human;
@@ -71,7 +81,11 @@ export class AiComponent implements OnInit {
     this.clickCount = 0;
     if (this.startingPlayer === 'ai') {
       this.currentPlayer = this.ai;
-      this.bestMove();
+      if(this.level === 'easy') {
+        this.badMove();
+      } else {
+        this.bestMove();
+      }
     }
     if (this.startingPlayer === 'human') {
       this.currentPlayer = this.human;
@@ -86,12 +100,33 @@ export class AiComponent implements OnInit {
         this.currentPlayer = this.ai;
         this.clickCount++;
         if (this.clickCount < 9) {
-          this.bestMove();
+          if(this.level === 'easy') {
+            this.winnerCheckFun();
+            if(this.winner === null) {
+              this.badMove();
+            }
+          } else {
+            this.bestMove();
+          }
         }
       } else {
         this.toastrService.show('This tile is already taken', `Warning`, { status: 'warning' });
       }
     }
+    this.winner = this.checkWinner();
+    if (this.winner != null) {
+      if (this.winner === 'X') {
+        this.player2Count++;
+        this.winnerName = this.player2;
+      } else if (this.winner === 'O') {
+        this.player1Count++;
+        this.winnerName = this.player1;
+      }
+      setTimeout(() => { this.gameOver = true; }, 400)
+    }
+  }
+
+  winnerCheckFun() {
     this.winner = this.checkWinner();
     if (this.winner != null) {
       if (this.winner === 'X') {
@@ -145,6 +180,22 @@ export class AiComponent implements OnInit {
     } else {
       return winner;
     }
+  }
+
+  badMove() {
+    //get random position
+    var i = Math.floor(Math.random()*this.squares.length);
+    var j = Math.floor(Math.random()*this.squares.length);
+    //check if position is empty
+    if(!this.squares[i][j]){
+      this.squares[i][j] = this.ai;
+      this.clickCount++;
+      this.currentPlayer = this.human;
+    } else {
+      this.badMove();
+    }
+    // var randomItem = this.squares[i][j];
+    // console.log(i, j, randomItem);
   }
 
   bestMove() {
@@ -212,6 +263,22 @@ export class AiComponent implements OnInit {
       }
       return bestScore;
     }
+  }
+
+  @HostListener("window:beforeunload", ["$event"])
+  unloadHandler(event: Event) {
+    console.log("Processing beforeunload...");
+    // Do more processing...
+    event.preventDefault();
+    event.returnValue = false;
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: Event) {
+    console.log('Back button pressed');
+
+    event.preventDefault();
+    event.returnValue = false;
   }
 
 }

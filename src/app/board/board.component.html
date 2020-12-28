@@ -1,4 +1,6 @@
-<h2>Player</h2>
+<div style="text-align: center; margin-top: 10px; margin-bottom: 10px;">
+  <button nbButton outline status="info" (click)="home()">Home</button>
+</div>
 <div *ngIf="playerCheck" class="main">
   <div class="div-row">
     <div class="div-col" style="text-align: center;">
@@ -29,7 +31,7 @@
     <app-square *ngFor="let square of squares; let i = index" [value]="square" (click)="makeMove(i)"></app-square>
   </main>
   <div *ngIf="winner" class="card-row">
-    <div class="card-col" style="margin: 0 auto; width: 20rem;">
+    <div class="card-col" style="margin: 0 auto;">
       <nb-card status="danger">
         <nb-card-header>Game Over</nb-card-header>
         <nb-card-body>
@@ -44,7 +46,7 @@
     </div>
   </div>
   <div *ngIf="winner === null && drawCheck === 9" class="card-row">
-    <div class="card-col" style="margin: 0 auto; width: 20rem;">
+    <div class="card-col" style="margin: 0 auto;">
       <nb-card status="danger">
         <nb-card-header>Game Over</nb-card-header>
         <nb-card-body>
@@ -56,7 +58,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="!playerCheck" class="card-col" style="margin: 0 auto; width: 20rem;">
+<div *ngIf="!playerCheck" class="card-col" style="margin: 0 auto;">
   <nb-card status="danger">
     <nb-card-header>Player Data</nb-card-header>
     <nb-card-body>

@@ -1,4 +1,6 @@
-<h2>AI</h2>
+<div style="text-align: center; margin-top: 10px; margin-bottom: 10px;">
+  <button nbButton outline status="info" (click)="home()">Home</button>
+</div>
 <div *ngIf="playerCheck" class="main">
   <div class="div-row">
     <div class="div-col" style="text-align: center;">
@@ -33,7 +35,7 @@
     </div>
   </main>
   <div *ngIf="winner && gameOver" class="card-row">
-    <div class="card-col" style="margin: 0 auto; width: 20rem;">
+    <div class="card-col" style="margin: 0 auto;">
       <nb-card status="danger">
         <nb-card-header>Game Over</nb-card-header>
         <nb-card-body>
@@ -50,17 +52,25 @@
     </div>
   </div>
 </div>
-<div *ngIf="!playerCheck" class="card-col" style="margin: 0 auto; width: 20rem;">
+<div *ngIf="!playerCheck" class="card-col" style="margin: 0 auto;">
   <nb-card status="danger">
     <nb-card-header>Player Data</nb-card-header>
     <nb-card-body>
       <form #userForm="ngForm" (ngSubmit)="submitPlayerData(userForm.value)" ngNativeValidate>
-        <input name="player1" [ngModel]="player1" required style="width: 100%; margin: 10px 0" type="text" nbInput
+        <label style="font-size: 12px;">Player Name:</label>
+        <input name="player1" [ngModel]="player1" required style="width: 100%; margin-bottom: 10px; margin-top: 4px" type="text" nbInput
           placeholder="Enter Player Name">
-          <nb-select required name="startingPlayer" style="width: 100%; margin: 10px 0" placeholder="Select Starting Player" [(selected)]="startingPlayer">
-            <nb-option disabled value="undefined">Select Starting Player</nb-option>
+          <label style="font-size: 12px;">Select Starting Player:</label>
+          <nb-select required name="startingPlayer" style="width: 100%; margin-bottom: 10px; margin-top: 4px" placeholder="Select Starting Player" [(selected)]="startingPlayer">
+            <nb-option disabled value="undefined">Choose an option</nb-option>
             <nb-option value="human">Human</nb-option>
             <nb-option value="ai">Computer</nb-option>
+          </nb-select>
+          <label style="font-size: 12px;">Select Level:</label>
+          <nb-select required name="level" style="width: 100%; margin-bottom: 10px; margin-top: 4px" placeholder="Select Level" [(selected)]="level">
+            <nb-option disabled value="undefined">Choose an option</nb-option>
+            <nb-option value="easy">Easy</nb-option>
+            <nb-option value="insane">Insane</nb-option>
           </nb-select>
         <button type="submit" style="margin-bottom: 1rem !important; margin: 0 3px; float: right" nbButton
           status="success">Submit</button>

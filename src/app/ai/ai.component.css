@@ -19,6 +19,7 @@ app-square {
 .card-col {
   flex: 1 0 calc(50% - 1rem);
   margin: 0 0.5rem;
+  width: 20rem;
 }
 
 .card-row {
@@ -51,6 +52,21 @@ app-square {
 
   .div-row {
     display: block;
+    width: 100%;
+  }
+}
+
+
+@media(max-width: 350px) {
+  .card-col {
+    width: auto;
+  }
+
+  .card-row {
+    width: 100%;
+  }
+
+  .div-row {
     width: 100%;
   }
 }
