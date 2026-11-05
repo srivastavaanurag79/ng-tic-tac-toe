@@ -12,7 +12,7 @@ export interface SessionConfig {
   relayUrl?: string;
 }
 
-export interface SessionEnvelope<T = any> {
+export interface SessionEnvelope<T = unknown> {
   v: 1;
   room: string;
   from: string;
@@ -49,19 +49,19 @@ export function createRoomCode(): string {
 @Injectable({ providedIn: 'root' })
 export class SessionService implements OnDestroy {
   private transport: Transport | null = null;
-  private clientId = randomId();
+  private readonly clientId = randomId();
   private config: SessionConfig | null = null;
-  private peers = new Map<string, SessionPeer>();
-  private connectedSubject = new BehaviorSubject<boolean>(false);
-  private peersSubject = new BehaviorSubject<SessionPeer[]>([]);
-  private errorSubject = new BehaviorSubject<string | null>(null);
-  private messageSubject = new BehaviorSubject<SessionEnvelope | null>(null);
+  private readonly peers = new Map<string, SessionPeer>();
+  private readonly connectedSubject = new BehaviorSubject<boolean>(false);
+  private readonly peersSubject = new BehaviorSubject<SessionPeer[]>([]);
+  private readonly errorSubject = new BehaviorSubject<string | null>(null);
+  private readonly messageSubject = new BehaviorSubject<SessionEnvelope | null>(null);
 
-  connected$ = this.connectedSubject.asObservable();
-  peers$ = this.peersSubject.asObservable();
-  error$ = this.errorSubject.asObservable();
+  readonly connected$ = this.connectedSubject.asObservable();
+  readonly peers$ = this.peersSubject.asObservable();
+  readonly error$ = this.errorSubject.asObservable();
 
-  constructor(private zone: NgZone) {}
+  constructor(private readonly zone: NgZone) {}
 
   get room(): string | null { return this.config ? this.config.room : null; }
   get name(): string { return this.config ? this.config.name : ''; }
@@ -84,15 +84,16 @@ export class SessionService implements OnDestroy {
       }
       this.connectedSubject.next(true);
       this.send('presence', { name: this.config.name, role: this.config.role });
-    } catch (e: any) {
-      this.errorSubject.next(e && e.message ? e.message : 'Failed to connect session.');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to connect session.';
+      this.errorSubject.next(message);
       this.connectedSubject.next(false);
     }
   }
 
   disconnect(): void {
     if (this.transport) {
-      try { this.send('leave', { name: this.name }); } catch {}
+      try { this.send('leave', { name: this.name }); } catch { /* ignore */ }
       this.transport.close();
       this.transport = null;
     }
@@ -144,8 +145,8 @@ export class SessionService implements OnDestroy {
     });
     ws.onmessage = (event) => this.zone.run(() => {
       try {
-        const data = JSON.parse(event.data);
-        if (data && data.t === 'error') { this.errorSubject.next(data.message || 'Relay error'); return; }
+        const data = JSON.parse(event.data) as { t?: string; message?: SessionEnvelope; error?: string };
+        if (data && data.t === 'error') { this.errorSubject.next(data.error || 'Relay error'); return; }
         if (data && data.t === 'relay' && data.message) { this.handleIncoming(data.message); return; }
         this.handleIncoming(data);
       } catch {
@@ -156,14 +157,15 @@ export class SessionService implements OnDestroy {
     ws.onclose = () => this.zone.run(() => this.connectedSubject.next(false));
     return {
       send: (message) => {
-        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ t: 'relay', room: config.room, message }));
-        else ws.addEventListener('open', () => ws.send(JSON.stringify({ t: 'relay', room: config.room, message })), { once: true } as any);
+        const frame = JSON.stringify({ t: 'relay', room: config.room, message });
+        if (ws.readyState === WebSocket.OPEN) ws.send(frame);
+        else ws.addEventListener('open', () => ws.send(frame), { once: true });
       },
       close: () => ws.close()
     };
   }
 
-  private handleIncoming(raw: any): void {
+  private handleIncoming(raw: unknown): void {
     if (!raw || !this.config) return;
     const message = raw as SessionEnvelope;
     if (message.v !== 1 || message.room !== this.config.room || message.from === this.clientId) return;
