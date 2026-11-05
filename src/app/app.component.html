@@ -1,15 +1,18 @@
 <nb-layout>
   <nb-layout-header>
-    <img src="assets/favicon/android-chrome-192x192.png" style="width: 75px; margin-right: 10px;">
-    <h5 style="margin: 0;">Kattam Kutta</h5>
+    <img src="assets/favicon/android-chrome-192x192.png" alt="Kattam Kutta logo" class="app-logo">
+    <h1 class="app-title">Kattam Kutta</h1>
   </nb-layout-header>
 
-  <nb-layout-column style="align-self: center;">
+  <nb-layout-column class="app-column">
     <router-outlet></router-outlet>
   </nb-layout-column>
 
   <nb-layout-footer>
-    <p class="paragraph-2" style="text-align: center;"> &copy; {{date | date:'yyyy'}}. <a style="text-decoration: none; color: white" href="https://thesrivastavaskitchenette.me/" target="_blank">The Srivastava's Kitchenette.</a><br> Made with ❤️ and 👨‍💻 in India</p>
+    <p class="paragraph-2 footer-copy">
+      &copy; {{ date | date:'yyyy' }}.
+      <a class="footer-link" href="https://thesrivastavaskitchenette.me/" target="_blank" rel="noopener noreferrer">The Srivastava's Kitchenette.</a>
+      <br> Made with care in India
+    </p>
   </nb-layout-footer>
-
 </nb-layout>

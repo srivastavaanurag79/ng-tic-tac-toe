@@ -1,0 +1,57 @@
+<div class="page-actions">
+  <button nbButton outline status="info" (click)="home()">Home</button>
+</div>
+
+<div *ngIf="setup" class="card-col setup-card">
+  <nb-card status="info">
+    <nb-card-header>Ludo (Quick)</nb-card-header>
+    <nb-card-body>
+      <p class="copy">Simplified 2-player race to home. Roll a 6 for an extra turn; exact roll required to finish.</p>
+      <form #f="ngForm" (ngSubmit)="start(f.value)" ngNativeValidate>
+        <label for="ludo-p1">Player 1</label>
+        <input id="ludo-p1" name="p1" [ngModel]="form.p1" required nbInput class="field" />
+        <label for="ludo-c1">Player 1 color</label>
+        <nb-select id="ludo-c1" name="c1" [(selected)]="form.c1" class="field">
+          <nb-option *ngFor="let c of colors" [value]="c">{{ c }}</nb-option>
+        </nb-select>
+        <label for="ludo-p2">Player 2</label>
+        <input id="ludo-p2" name="p2" [ngModel]="form.p2" required nbInput class="field" />
+        <label for="ludo-c2">Player 2 color</label>
+        <nb-select id="ludo-c2" name="c2" [(selected)]="form.c2" class="field">
+          <nb-option *ngFor="let c of colors" [value]="c">{{ c }}</nb-option>
+        </nb-select>
+        <button nbButton status="success" type="submit">Start</button>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</div>
+
+<div *ngIf="!setup" class="game">
+  <nb-card>
+    <nb-card-header>Quick Ludo</nb-card-header>
+    <nb-card-body>
+      <p aria-live="polite">{{ message }}</p>
+      <div class="controls">
+        <button nbButton status="primary" (click)="roll()" [disabled]="!!winner">Roll Dice{{ dice ? ' (last: ' + dice + ')' : '' }}</button>
+        <button nbButton outline status="warning" (click)="reset()">New Setup</button>
+      </div>
+
+      <div class="players">
+        <div class="player" *ngFor="let p of players" [class.active]="current() === p && !winner">
+          <strong>{{ p.name }}</strong> <span class="chip" [attr.data-color]="p.color">{{ p.color }}</span>
+          <div>Position: {{ p.position }} / 20</div>
+          <div class="track" [attr.aria-label]="p.name + ' track'">
+            <span class="cell" *ngFor="let c of track(p)" [class.token]="c !== '·' && c !== 'S' && c !== 'H'">{{ c }}</span>
+          </div>
+        </div>
+      </div>
+
+      <nb-card *ngIf="winner" status="success">
+        <nb-card-body><strong>{{ winner.name }} wins!</strong></nb-card-body>
+      </nb-card>
+
+      <h6>Recent moves</h6>
+      <ul class="log"><li *ngFor="let entry of log">{{ entry }}</li></ul>
+    </nb-card-body>
+  </nb-card>
+</div>

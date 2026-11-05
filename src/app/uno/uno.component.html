@@ -1,0 +1,61 @@
+<div class="page-actions">
+  <button nbButton outline status="info" (click)="home()">Home</button>
+</div>
+
+<div *ngIf="setup" class="card-col setup-card">
+  <nb-card status="warning">
+    <nb-card-header>Uno (Quick)</nb-card-header>
+    <nb-card-body>
+      <p class="copy">Simplified Uno vs Bot: number cards plus Skip/Reverse. Match the top card by color or value. No wild cards in this quick mode.</p>
+      <form #f="ngForm" (ngSubmit)="start(f.value)" ngNativeValidate>
+        <label for="uno-name">Your name</label>
+        <input id="uno-name" name="playerName" [ngModel]="playerName" required nbInput class="field" />
+        <button nbButton status="success" type="submit">Start</button>
+      </form>
+    </nb-card-body>
+  </nb-card>
+</div>
+
+<div *ngIf="!setup" class="game">
+  <nb-card>
+    <nb-card-header>Quick Uno</nb-card-header>
+    <nb-card-body>
+      <p aria-live="polite">{{ message }}</p>
+      <div class="table">
+        <div class="pile">
+          <div class="label">Top card</div>
+          <div class="uno-card top" *ngIf="top() as card" [attr.data-color]="card.color">
+            <span>{{ card.color }}</span><strong>{{ card.value }}</strong>
+          </div>
+        </div>
+        <div class="pile">
+          <div class="label">Bot hand</div>
+          <div>{{ botHand.length }} card(s)</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button nbButton status="primary" (click)="drawCard()" [disabled]="busy || !!winner || current !== 'player'">Draw Card</button>
+        <button nbButton outline status="warning" (click)="reset()">New Setup</button>
+        <button nbButton outline status="basic" (click)="newRound()" [disabled]="busy">Restart Round</button>
+      </div>
+
+      <nb-card *ngIf="winner" status="success"><nb-card-body><strong>{{ winner }} wins!</strong></nb-card-body></nb-card>
+
+      <h6>Your hand</h6>
+      <div class="hand">
+        <button
+          type="button"
+          class="uno-card"
+          *ngFor="let card of playerHand"
+          [attr.data-color]="card.color"
+          [disabled]="busy || !!winner || current !== 'player' || !canPlay(card)"
+          (click)="play(card)"
+          [attr.aria-label]="card.color + ' ' + card.value + (canPlay(card) ? ', playable' : ', not playable')"
+        >
+          <span>{{ card.color }}</span><strong>{{ card.value }}</strong>
+        </button>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>

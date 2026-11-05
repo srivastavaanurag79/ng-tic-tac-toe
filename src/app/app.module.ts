@@ -13,6 +13,9 @@ import { environment } from '../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { AiComponent } from './ai/ai.component';
 import { HomepageComponent } from './homepage/homepage.component';
+import { LudoComponent } from './ludo/ludo.component';
+import { UnoComponent } from './uno/uno.component';
+import { SessionPanelComponent } from './shared/session-panel.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +23,10 @@ import { HomepageComponent } from './homepage/homepage.component';
     SquareComponent,
     BoardComponent,
     AiComponent,
-    HomepageComponent
+    HomepageComponent,
+    LudoComponent,
+    UnoComponent,
+    SessionPanelComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +40,7 @@ import { HomepageComponent } from './homepage/homepage.component';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     NbInputModule,
     FormsModule,
-    NbToastrModule.forRoot({preventDuplicates: true }),
+    NbToastrModule.forRoot({ preventDuplicates: true }),
     NbSelectModule
   ],
   providers: [],
