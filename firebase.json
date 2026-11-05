@@ -1,28 +1,28 @@
 {
-  "hosting": {
-    "target": "ng-tic-tac-toe",
-    "public": "dist/ng-tic-tac-toe/browser",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(js|css|woff2|png|jpg|jpeg|gif|svg|ico|webp)",
-        "headers": [
-          { "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }
-        ]
-      },
-      {
-        "source": "/ngsw-worker.js",
-        "headers": [
-          { "key": "Cache-Control", "value": "no-cache" }
-        ]
-      }
-    ],
-    "rewrites": [
-      { "source": "**", "destination": "/index.html" }
-    ]
-  }
+  "hosting": [
+    {
+      "target": "ng-tic-tac-toe",
+      "public": "dist/ng-tic-tac-toe",
+      "ignore": [
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public,max-age=31536000,immutable"
+            }
+          ]
+        }
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
 }
