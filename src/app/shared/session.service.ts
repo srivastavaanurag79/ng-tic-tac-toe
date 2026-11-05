@@ -84,10 +84,12 @@ export class SessionService implements OnDestroy {
       }
       this.connectedSubject.next(true);
       this.send('presence', { name: this.config.name, role: this.config.role });
-    } catch (e: any) {
-      this.errorSubject.next(e && e.message ? e.message : 'Failed to connect session.');
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to connect session.';
+      this.errorSubject.next(message);
       this.connectedSubject.next(false);
     }
+
   }
 
   disconnect(): void {
