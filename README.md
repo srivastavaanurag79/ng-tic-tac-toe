@@ -27,3 +27,11 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+## Session-based group games
+
+The Tic Tac Toe (2-player), Ludo, and Uno modes support session-based group play inspired by the room/session model in [ghostwire](https://github.com/srivastavaanurag79/ghostwire) (room codes, host/join flow, transport abstraction). This app uses a lightweight game-state relay model (not Ghostwire's E2E mesh protocol).
+
+- **Same browser/device tabs**: uses `BroadcastChannel` for local multi-tab testing.
+- **Cross-device/network**: run `node session-relay.js [port]` on a host machine and connect clients to `ws://<host-ip>:8787`.
+- Ludo and Uno are **quick/simplified** implementations with host-authoritative session state; Tic Tac Toe 2-player can be played locally or as a shared session.

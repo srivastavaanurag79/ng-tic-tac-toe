@@ -1,6 +1,9 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbToastrService } from '@nebular/theme';
+
+type AiCell = 'X' | 'O' | '';
+type AiBoard = [AiCell[], AiCell[], AiCell[]];
 
 @Component({
   selector: 'app-ai',
@@ -8,207 +11,226 @@ import { NbToastrService } from '@nebular/theme';
   styleUrls: ['./ai.component.css']
 })
 export class AiComponent implements OnInit {
-
-  squares = [
-    [null, null, null],
-    [null, null, null],
-    [null, null, null]
-  ];
-  winner: string;
-  playerCheck: boolean = false;
+  squares: AiBoard = this.emptyBoard();
+  winner: 'X' | 'O' | 'tie' | null = null;
+  winnerName = '';
+  gameOver = false;
+  playerCheck = false;
   startingPlayer: 'human' | 'ai' = 'ai';
   level: 'easy' | 'insane' = 'insane';
-  player1: string;
-  player2: string = 'Computer';
-  player1Count: number = 0;
-  player2Count: number = 0;
-  clickCount: number = 0;
-  ai = 'X';
-  human = 'O';
-  currentPlayer;
-  winnerName: string;
-  gameOver: boolean = false;
+  player1 = '';
+  player2 = 'Computer';
+  player1Count = 0;
+  player2Count = 0;
+  clickCount = 0;
+  ai: 'X' = 'X';
+  human: 'O' = 'O';
+  currentPlayer: 'X' | 'O' = 'X';
+  winningLine: Array<{ i: number; j: number }> = [];
+
+  private readonly scores: Record<string, number> = { X: 10, O: -10, tie: 0 };
 
   constructor(private toastrService: NbToastrService, private router: Router) { }
 
-  home() {
+  home(): void {
+    if (this.shouldConfirmLeave()) {
+      this.toastrService.show('Finish or reset the current game before leaving.', 'Game in progress', { status: 'warning' });
+      return;
+    }
     this.router.navigate(['/']);
   }
 
-  ngOnInit() {
-    this.resetGame();
+  ngOnInit(): void {
+    this.resetBoardState();
   }
 
-  submitPlayerData(form) {
-    this.player1 = form.player1;
+  submitPlayerData(form: { player1?: string; startingPlayer?: 'human' | 'ai'; level?: 'easy' | 'insane' }): void {
+    const name = (form.player1 || '').trim();
+    if (!name) {
+      this.toastrService.show('Please enter your name.', 'Missing data', { status: 'warning' });
+      return;
+    }
+    this.player1 = name;
+    this.startingPlayer = form.startingPlayer || this.startingPlayer;
+    this.level = form.level || this.level;
     this.playerCheck = true;
-    if (this.startingPlayer === 'ai') {
-      this.currentPlayer = this.ai;
-      if(this.level === 'easy') {
-        this.badMove();
-      } else {
-        this.bestMove();
-      }
-    }
-    if(this.startingPlayer === 'human') {
-      this.currentPlayer = this.human;
-    }
+    this.startRound();
   }
 
-  resetGame() {
-    this.squares = [
-      [null, null, null],
-      [null, null, null],
-      [null, null, null]
-    ];
-    this.winner = null;
+  resetGame(): void {
+    if (this.shouldConfirmLeave() && !confirm('Reset scores and player data?')) {
+      return;
+    }
+    this.resetBoardState();
     this.player1Count = 0;
     this.player2Count = 0;
-    this.clickCount = 0;
     this.player1 = '';
     this.player2 = 'Computer';
     this.playerCheck = false;
-    this.gameOver = false;
   }
 
-  newGame() {
-    this.squares = [
-      [null, null, null],
-      [null, null, null],
-      [null, null, null]
+  newGame(): void {
+    this.resetBoardState();
+    if (this.playerCheck) {
+      this.startRound();
+    }
+  }
+
+  private emptyBoard(): AiBoard {
+    return [
+      ['', '', ''],
+      ['', '', ''],
+      ['', '', '']
     ];
+  }
+
+  private resetBoardState(): void {
+    this.squares = this.emptyBoard();
     this.winner = null;
+    this.winnerName = '';
     this.clickCount = 0;
+    this.gameOver = false;
+    this.currentPlayer = this.ai;
+    this.winningLine = [];
+  }
+
+  private startRound(): void {
     if (this.startingPlayer === 'ai') {
       this.currentPlayer = this.ai;
-      if(this.level === 'easy') {
-        this.badMove();
-      } else {
-        this.bestMove();
-      }
-    }
-    if (this.startingPlayer === 'human') {
+      this.computerMove();
+    } else {
       this.currentPlayer = this.human;
     }
-    this.gameOver = false;
   }
 
-  makeMove(idx: number, idy: number) {
-    if (this.currentPlayer === this.human) {
-      if (!this.squares[idx][idy]) {
-        this.squares[idx][idy] = this.human;
-        this.currentPlayer = this.ai;
-        this.clickCount++;
-        if (this.clickCount < 9) {
-          if(this.level === 'easy') {
-            this.winnerCheckFun();
-            if(this.winner === null) {
-              this.badMove();
-            }
-          } else {
-            this.bestMove();
-          }
-        }
-      } else {
-        this.toastrService.show('This tile is already taken', `Warning`, { status: 'warning' });
-      }
+  get statusMessage(): string {
+    if (this.gameOver && this.winner === 'tie') {
+      return 'Match drawn.';
     }
-    this.winner = this.checkWinner();
-    if (this.winner != null) {
-      if (this.winner === 'X') {
-        this.player2Count++;
-        this.winnerName = this.player2;
-      } else if (this.winner === 'O') {
-        this.player1Count++;
-        this.winnerName = this.player1;
-      }
-      setTimeout(() => { this.gameOver = true; }, 400)
+    if (this.gameOver && this.winnerName) {
+      return `${this.winnerName} won the game.`;
+    }
+    const who = this.currentPlayer === this.human ? (this.player1 || 'Human') : 'Computer';
+    return `Current player: ${who} (${this.currentPlayer}).`;
+  }
+
+  isWinningCell(i: number, j: number): boolean {
+    return this.winningLine.some((c) => c.i === i && c.j === j);
+  }
+
+  cellLabel(i: number, j: number): string {
+    const value = this.squares[i][j];
+    return `Row ${i + 1}, column ${j + 1}: ${value || 'empty'}`;
+  }
+
+  makeMove(i: number, j: number): void {
+    if (this.gameOver || this.currentPlayer !== this.human) {
+      return;
+    }
+    if (this.squares[i][j]) {
+      this.toastrService.show('This tile is already taken', 'Warning', { status: 'warning' });
+      return;
+    }
+    this.squares[i][j] = this.human;
+    this.clickCount++;
+    if (this.resolveWinner()) {
+      return;
+    }
+    this.currentPlayer = this.ai;
+    this.computerMove();
+  }
+
+  private computerMove(): void {
+    if (this.gameOver) {
+      return;
+    }
+    if (this.level === 'easy') {
+      this.badMove();
+    } else {
+      this.bestMove();
+    }
+    if (!this.gameOver) {
+      this.currentPlayer = this.human;
     }
   }
 
-  winnerCheckFun() {
-    this.winner = this.checkWinner();
-    if (this.winner != null) {
-      if (this.winner === 'X') {
-        this.player2Count++;
-        this.winnerName = this.player2;
-      } else if (this.winner === 'O') {
-        this.player1Count++;
-        this.winnerName = this.player1;
-      }
-      setTimeout(() => { this.gameOver = true; }, 400)
+  private resolveWinner(): boolean {
+    const result = this.findWinner(this.squares);
+    if (!result.winner) {
+      return false;
     }
+    this.winner = result.winner;
+    this.winningLine = result.line;
+    if (this.winner === 'X') {
+      this.player2Count++;
+      this.winnerName = this.player2;
+    } else if (this.winner === 'O') {
+      this.player1Count++;
+      this.winnerName = this.player1;
+    } else {
+      this.winnerName = '';
+    }
+    setTimeout(() => { this.gameOver = true; }, 250);
+    return true;
   }
 
-  equals3(a, b, c) {
-    return a == b && b == c && a;
+  private equals3(a: AiCell, b: AiCell, c: AiCell): AiCell | false {
+    return a !== '' && a === b && b === c ? a : false;
   }
 
-  checkWinner() {
-    let winner = null;
-    // horizontal
+  checkWinner(): 'X' | 'O' | 'tie' | null {
+    return this.findWinner(this.squares).winner;
+  }
+
+  private findWinner(board: AiBoard): { winner: 'X' | 'O' | 'tie' | null; line: Array<{ i: number; j: number }> } {
     for (let i = 0; i < 3; i++) {
-      if (this.equals3(this.squares[i][0], this.squares[i][1], this.squares[i][2])) {
-        winner = this.squares[i][0];
+      if (this.equals3(board[i][0], board[i][1], board[i][2])) {
+        return { winner: board[i][0] as 'X' | 'O', line: [{ i, j: 0 }, { i, j: 1 }, { i, j: 2 }] };
       }
     }
-    // Vertical
-    for (let i = 0; i < 3; i++) {
-      if (this.equals3(this.squares[0][i], this.squares[1][i], this.squares[2][i])) {
-        winner = this.squares[0][i];
+    for (let j = 0; j < 3; j++) {
+      if (this.equals3(board[0][j], board[1][j], board[2][j])) {
+        return { winner: board[0][j] as 'X' | 'O', line: [{ i: 0, j }, { i: 1, j }, { i: 2, j }] };
       }
     }
-    // Diagonal
-    if (this.equals3(this.squares[0][0], this.squares[1][1], this.squares[2][2])) {
-      winner = this.squares[0][0];
+    if (this.equals3(board[0][0], board[1][1], board[2][2])) {
+      return { winner: board[0][0] as 'X' | 'O', line: [{ i: 0, j: 0 }, { i: 1, j: 1 }, { i: 2, j: 2 }] };
     }
-    if (this.equals3(this.squares[2][0], this.squares[1][1], this.squares[0][2])) {
-      winner = this.squares[2][0];
+    if (this.equals3(board[2][0], board[1][1], board[0][2])) {
+      return { winner: board[2][0] as 'X' | 'O', line: [{ i: 2, j: 0 }, { i: 1, j: 1 }, { i: 0, j: 2 }] };
     }
+    const openSpots = board.some((row) => row.some((cell) => cell === ''));
+    return openSpots ? { winner: null, line: [] } : { winner: 'tie', line: [] };
+  }
 
-    let openSpots = 0;
+  badMove(): void {
+    const empty: Array<{ i: number; j: number }> = [];
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         if (!this.squares[i][j]) {
-          openSpots++;
+          empty.push({ i, j });
         }
       }
     }
-
-    if (winner === null && openSpots === 0) {
-      return 'tie';
-    } else {
-      return winner;
+    if (!empty.length) {
+      this.resolveWinner();
+      return;
     }
+    const pick = empty[Math.floor(Math.random() * empty.length)];
+    this.squares[pick.i][pick.j] = this.ai;
+    this.clickCount++;
+    this.resolveWinner();
   }
 
-  badMove() {
-    //get random position
-    var i = Math.floor(Math.random()*this.squares.length);
-    var j = Math.floor(Math.random()*this.squares.length);
-    //check if position is empty
-    if(!this.squares[i][j]){
-      this.squares[i][j] = this.ai;
-      this.clickCount++;
-      this.currentPlayer = this.human;
-    } else {
-      this.badMove();
-    }
-    // var randomItem = this.squares[i][j];
-    // console.log(i, j, randomItem);
-  }
-
-  bestMove() {
-    // AI to make its turn
+  bestMove(): void {
     let bestScore = -Infinity;
-    let move;
+    let move: { i: number; j: number } | null = null;
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
-        // Is the spot available?
         if (!this.squares[i][j]) {
           this.squares[i][j] = this.ai;
-          let score = this.minimax(this.squares, 0, false);
-          this.squares[i][j] = null;
+          const score = this.minimax(this.squares, 0, false);
+          this.squares[i][j] = '';
           if (score > bestScore) {
             bestScore = score;
             move = { i, j };
@@ -216,69 +238,48 @@ export class AiComponent implements OnInit {
         }
       }
     }
+    if (!move) {
+      this.resolveWinner();
+      return;
+    }
     this.squares[move.i][move.j] = this.ai;
     this.clickCount++;
-    this.currentPlayer = this.human;
-
+    this.resolveWinner();
   }
 
-  scores = {
-    X: 10,
-    O: -10,
-    tie: 0
-  };
-
-  minimax(board, depth, isMaximizing) {
-    let result = this.checkWinner();
+  minimax(board: AiBoard, depth: number, isMaximizing: boolean): number {
+    const result = this.findWinner(board).winner;
     if (result !== null) {
-      return this.scores[result];
+      const score = this.scores[result];
+      return result === 'X' ? score - depth : result === 'O' ? score + depth : score;
     }
-
     if (isMaximizing) {
       let bestScore = -Infinity;
       for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
-          // Is the spot available?
           if (!board[i][j]) {
             board[i][j] = this.ai;
-            let score = this.minimax(board, depth + 1, false);
-            board[i][j] = null;
-            bestScore = Math.max(score, bestScore);
-          }
-        }
-      }
-      return bestScore;
-    } else {
-      let bestScore = Infinity;
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          // Is the spot available?
-          if (!board[i][j]) {
-            board[i][j] = this.human;
-            let score = this.minimax(board, depth + 1, true);
-            board[i][j] = null;
-            bestScore = Math.min(score, bestScore);
+            bestScore = Math.max(bestScore, this.minimax(board, depth + 1, false));
+            board[i][j] = '';
           }
         }
       }
       return bestScore;
     }
+    let bestScore = Infinity;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (!board[i][j]) {
+          board[i][j] = this.human;
+          bestScore = Math.min(bestScore, this.minimax(board, depth + 1, true));
+          board[i][j] = '';
+        }
+      }
+    }
+    return bestScore;
   }
 
-  @HostListener("window:beforeunload", ["$event"])
-  unloadHandler(event: Event) {
-    console.log("Processing beforeunload...");
-    // Do more processing...
-    event.preventDefault();
-    event.returnValue = false;
+  private shouldConfirmLeave(): boolean {
+    return this.playerCheck && !this.gameOver && this.clickCount > 0;
   }
-
-  @HostListener('window:popstate', ['$event'])
-  onPopState(event: Event) {
-    console.log('Back button pressed');
-
-    event.preventDefault();
-    event.returnValue = false;
-  }
-
 }

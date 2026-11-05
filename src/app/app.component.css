@@ -1,19 +1,5 @@
-.div-row {
-  margin: 0 auto;
-  display: flex;
-  width: 100%;
-  height: inherit;
-}
-
-.div-col {
-  flex: 1 0 calc(50% - 1rem);
-  margin: 0 0.5rem;
-}
-
-@media (max-width: 600px) {
-
-  .div-row {
-    display: block;
-    width: 100%;
-  }
-}
+.app-logo { width: 56px; margin-right: 12px; }
+.app-title { margin: 0; font-size: 1.25rem; }
+.app-column { align-self: center; }
+.footer-copy { text-align: center; margin: 0; }
+.footer-link { text-decoration: none; color: inherit; }

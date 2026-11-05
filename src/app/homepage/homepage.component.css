@@ -1,32 +1,6 @@
-.div-row {
-  margin: 0 auto;
-  display: flex;
-  width: 40rem;
-}
-
-.div-col {
-  flex: 1 0 calc(50% - 1rem);
-  margin: 0 0.5rem;
-}
-
-@media (max-width: 600px) {
-
-  .div-row {
-    display: block;
-    width: 100%;
-  }
-}
-
-@media(max-width: 350px) {
-  .card-col {
-    width: auto;
-  }
-
-  .card-row {
-    width: 100%;
-  }
-
-  .div-row {
-    width: 100%;
-  }
-}
+.div-row { margin: 0 auto; display: flex; width: 40rem; }
+.div-col { flex: 1 0 calc(50% - 1rem); margin: 0 0.5rem; }
+.hub-copy { margin: 0 0 1rem; }
+.hub-actions { display: grid; gap: 0.75rem; }
+@media (max-width: 600px) { .div-row { display: block; width: 100%; } }
+@media (max-width: 350px) { .div-row, .div-col { width: 100%; } }

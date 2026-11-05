@@ -1,3 +1,29 @@
-<button [disabled]="winner != null" *ngIf="!value" nbButton hero status="basic">{{ value }}</button>
-<button *ngIf="value === 'X'" nbButton hero status="success">{{ value }}</button>
-<button *ngIf="value === 'O'" nbButton hero status="info">{{ value }}</button>
+<button
+  type="button"
+  [disabled]="disabled || !!winner || !!value"
+  [class.highlight]="highlight"
+  [attr.aria-label]="ariaLabel"
+  [attr.aria-pressed]="!!value"
+  *ngIf="!value"
+  nbButton
+  hero
+  status="basic"
+></button>
+<button
+  type="button"
+  [class.highlight]="highlight"
+  [attr.aria-label]="ariaLabel"
+  *ngIf="value === 'X'"
+  nbButton
+  hero
+  status="success"
+>{{ value }}</button>
+<button
+  type="button"
+  [class.highlight]="highlight"
+  [attr.aria-label]="ariaLabel"
+  *ngIf="value === 'O'"
+  nbButton
+  hero
+  status="info"
+>{{ value }}</button>

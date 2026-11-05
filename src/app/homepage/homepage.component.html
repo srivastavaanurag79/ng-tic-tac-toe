@@ -2,10 +2,15 @@
   <div class="div-row">
     <div class="div-col" style="text-align: center;">
       <nb-card status="basic">
-        <nb-card-header>Select Mode</nb-card-header>
+        <nb-card-header>Game Hub</nb-card-header>
         <nb-card-body>
-          <button nbButton outline status="primary" size="large" (click)="computer()">Computer vs Human</button><br><br>
-          <button nbButton outline status="success" size="large" (click)="human()">Human vs Human</button>
+          <p class="hub-copy">Choose a game to play.</p>
+          <div class="hub-actions">
+            <button nbButton outline status="primary" size="large" (click)="go('one-player')">Tic Tac Toe: vs Computer</button>
+            <button nbButton outline status="success" size="large" (click)="go('two-player')">Tic Tac Toe: 2 Players</button>
+            <button nbButton outline status="info" size="large" (click)="go('ludo')">Ludo (Quick)</button>
+            <button nbButton outline status="warning" size="large" (click)="go('uno')">Uno (Quick)</button>
+          </div>
         </nb-card-body>
       </nb-card>
     </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,18 +6,10 @@ import { Router } from '@angular/router';
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.css']
 })
-export class HomepageComponent implements OnInit {
-
+export class HomepageComponent {
   constructor(private router: Router) { }
 
-  ngOnInit(): void {
-  }
-
-  computer() {
-    this.router.navigate(['/one-player']);
-  }
-
-  human() {
-    this.router.navigate(['/two-player']);
+  go(path: string): void {
+    this.router.navigate([`/${path}`]);
   }
 }
